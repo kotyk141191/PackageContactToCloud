@@ -70,7 +70,7 @@ public class PackageContactToCloud {
         
         let predicate = NSPredicate(value: true)
         let query = CKQuery(recordType: "ContactBook", predicate: predicate)
-        query.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
+        query.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         let queryOperation = CKQueryOperation(query: query)
         queryOperation.resultsLimit = 1
         
