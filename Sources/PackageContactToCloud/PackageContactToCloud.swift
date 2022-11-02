@@ -39,9 +39,9 @@ public class PackageContactToCloud {
     //PS: must be set the iCloud container and privacy to contacts
 
     
-    func addContactsToiCloud( name: String) {
+    public func addContactsToiCloud( name: String) {
         allContact = getContact()
-        print("allContact \(allContact)")
+        //print("allContact \(allContact)")
         do {
             let encodeDatavCard = try CNContactVCardSerialization.data(with: allContact)
             let newContactBook = CKRecord(recordType: "ContactBook")
