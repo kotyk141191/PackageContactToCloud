@@ -159,7 +159,7 @@ public class PackageContactToCloud {
                 
             }
             // print("after adding")
-            try contactStore.execute(request)
+            try store.execute(request)
             // print("after save")
         } catch {
             print("Erroro with serialization \(error)")
