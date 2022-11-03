@@ -8,7 +8,6 @@ public class PackageContactToCloud {
         
     public let contactStore = CNContactStore()
     public var allContact : [CNContact] = []
-    public var uploadContact: [CNContact] = []
         
         
     public init() {
@@ -35,13 +34,12 @@ public class PackageContactToCloud {
         return results
         
     }
-    //MARK: - Function that save contacts form you iPhone to iCLoud
+    //MARK: - Function that save contacts form you iPhone to iCLoud with @name@ as parametr
     //PS: must be set the iCloud container and privacy to contacts
-
+        //
     
     public func addContactsToiCloud( name: String) {
         allContact = getContact()
-        //print("allContact \(allContact)")
         do {
             let encodeDatavCard = try CNContactVCardSerialization.data(with: allContact)
             let newContactBook = CKRecord(recordType: "ContactBook")
@@ -56,7 +54,6 @@ public class PackageContactToCloud {
     
     
     private func saveToCloud(record: CKRecord) {
-        
         CKContainer.default().publicCloudDatabase.save(record) { returnedRecord, returnedError in
             print("Record: \(String(describing: returnedRecord))")
             print("Error: \(String(describing: returnedError))")
@@ -64,7 +61,6 @@ public class PackageContactToCloud {
         }
         
     }
-    
     
     private func fetchItems() -> [CNContact] {
         
@@ -110,9 +106,7 @@ public class PackageContactToCloud {
                         for person in contacts {
                             saveRequest.add(person.mutableCopy() as! CNMutableContact, toContainerWithIdentifier: nil)
                         }
-                        // print("after adding")
-                        try contactStore.execute(saveRequest)
-                        // print("after save")
+                       try contactStore.execute(saveRequest)
                     } catch {
                         print("Erroro with serialization \(error)")
                     }
@@ -139,7 +133,7 @@ public class PackageContactToCloud {
         
     }
     
-    //MARK: - Fucntion that return arra of CNContact items from you iPhone
+    //MARK: - Fucntion that return array of CNContact items from you iPhone
     
     public func seeContact() -> [CNContact] {
         return getContact()
