@@ -1,17 +1,92 @@
 import Contacts
 import CloudKit
+import CloudKit
+
+class CloudKitUserPermisionModel {
+    private var permissionStatus : Bool = false
+    private var isSignedInToiCloud : Bool = false
+    private var error : String = ""
+    private var userName : String = ""
+    
+    init() {
+        getiCloudStatus()
+        requestPermision()
+        fetchiCloudUserRecordID()
+        print(permissionStatus)
+        print(isSignedInToiCloud)
+        print(userName)
+    }
+    
+    private func getiCloudStatus() {
+        CKContainer.default().accountStatus {[weak self] returnedStatus, returnedError in
+            DispatchQueue.main.async {
+                switch returnedStatus {
+                case .available:
+                    self?.isSignedInToiCloud = true
+                case .noAccount :
+                    self?.error = CloudKitError.iCloudAccountNotFound.localizedDescription
+                case .couldNotDetermine:
+                    self?.error = CloudKitError.iCloudAccountNotDeterminated.localizedDescription
+                case .restricted  :
+                    self?.error = CloudKitError.iCloudAccountRestricted.localizedDescription
+                default :
+                    self?.error = CloudKitError.iCloudAccountUnknown.localizedDescription
+                }
+            }
+        }
+    }
+    
+    enum CloudKitError : LocalizedError {
+        case iCloudAccountNotFound
+        case iCloudAccountNotDeterminated
+        case iCloudAccountRestricted
+        case iCloudAccountUnknown
+    }
+    
+    func requestPermision() {
+        CKContainer.default().requestApplicationPermission([.userDiscoverability]) { [weak self]returnedStarus, returneError in
+            DispatchQueue.main.async {
+                if returnedStarus == .granted {
+                    self?.permissionStatus = true
+                }
+            }
+        }
+    }
+    
+    func fetchiCloudUserRecordID() {
+        CKContainer.default().fetchUserRecordID { [weak self] returnedID, returnedError in
+            if let id = returnedID {
+                self?.discoveriCloudUser(id: id)
+            }
+        }
+    }
+    
+    func discoveriCloudUser(id: CKRecord.ID) {
+        CKContainer.default().discoverUserIdentity(withUserRecordID: id) { [weak self] returnedIdentity, returnedError in
+            DispatchQueue.main.async {
+                if let name = returnedIdentity?.nameComponents?.givenName {
+                    self?.userName = name
+                }
+            }
+        }
+    }
+    
+}
+
+
 
 @available(macOS 12.0, *)
 public class PackageContactToCloud {
     
     
-        
+    private let cloudKitUserPermision =  CloudKitUserPermisionModel()
     public let contactStore = CNContactStore()
     public var allContact : [CNContact] = []
         
         
     public init() {
         allContact = getContact()
+        
     }
         
         
@@ -79,7 +154,6 @@ public class PackageContactToCloud {
                 case .success(let record):
                     guard let data = record["data"] as? Data else {return}
                     returnedItems = data
-                    print(data)
                 case .failure(let error) :
                     print(error)
                     
@@ -89,7 +163,6 @@ public class PackageContactToCloud {
             queryOperation.recordFetchedBlock = { (returnedRecord) in
                 guard let data = returnedRecord["data"] as? Data else {return}
                 returnedItems = data
-                print(data)
             }
         }
         
