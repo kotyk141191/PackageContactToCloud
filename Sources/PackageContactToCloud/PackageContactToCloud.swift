@@ -85,7 +85,7 @@ public class PackageContactToCloud {
         
         
     public init() {
-        allContact = getContact()
+       // allContact = getContact()
         
     }
         
@@ -209,7 +209,8 @@ public class PackageContactToCloud {
     //MARK: - Fucntion that return array of CNContact items from you iPhone
     
     public func seeContact() -> [CNContact] {
-        return getContact()
+        allContact = getContact()
+        return allContact
     }
     
     //MARK: - Fucntion that delete all contacts from you iPhone
